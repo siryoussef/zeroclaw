@@ -5,6 +5,11 @@ ZeroClaw ships a multi-instance NixOS module at
 It runs one or more agents under systemd with hardening defaults appropriate
 for an internet-facing process, modelled on `services.restic.backups`.
 
+For a user-owned daemon, the flake also exposes
+`homeManagerModules.default`. Import it in Home Manager and enable
+`programs.zeroclaw`; it uses `systemd.user` and defaults its state directory
+to `~/.zeroclaw`.
+
 ## The package
 
 The upstream flake builds ZeroClaw from source. With Nix's `nix-command` and
