@@ -1,5 +1,37 @@
 # NixOS module for ZeroClaw
 
+## Home Manager
+
+The flake also exposes `homeManagerModules.default` for running one
+user-owned daemon through `systemd.user`. Import it from a Home Manager
+configuration and enable `programs.zeroclaw`:
+
+```nix
+{ inputs, ... }: {
+  imports = [ inputs.zeroclaw.homeManagerModules.default ];
+
+  programs.zeroclaw = {
+    enable = true;
+    settings = {
+      schema_version = 4;
+      providers.models.anthropic.default.model = "claude-sonnet-4-6";
+      agents.default = {
+        model_provider = "anthropic.default";
+        risk_profile = "default";
+      };
+      risk_profiles.default = { };
+    };
+  };
+}
+```
+
+The module installs the selected package for the user, renders
+`settings` (plus optional `extraConfig`) to `~/.zeroclaw/config.toml`, and
+starts `zeroclaw daemon` as a user service. Use `environmentFile` with
+`$VAR` placeholders in string settings for secrets; the rendered file is
+written with mode `0600`. `dataDir`, `package`, and `webUiPackage` can be
+overridden for non-default layouts.
+
 `nix/module.nix` is a multi-instance NixOS module that runs ZeroClaw under
 systemd with sandboxing defaults appropriate for an internet-facing agent
 process. It is designed to be importable from any NixOS configuration —
